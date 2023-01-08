@@ -16,25 +16,49 @@
  * exercise I'm pushing in it's current state
 */
 
-struct linkedList
+struct Node
 {
     int val;
-    struct linkedList* next;
+    struct Node* next;
 };
 
-int listSearch(struct linkedList **L, int k)
+int listSearch(struct Node **L, int k)
 {
-    /*
-    x <- head[L]
-    while x != NIL and key[x] != k
-       do x <- next[x]
-    return x
-    */
+    if(!*L)
+    {
+        printf("LIST CANNOT BE EMPTY\n");
+        return -1;
+    }
+
+    int currentVal = (*L)->val;
+    
+    while(*L && currentVal != k)
+    {
+        currentVal = (*L)->val;
+        (*L) = (*L)->next;
+    }
+    
+    if(!currentVal)
+    {
+        printf("No values found (encountered NULL), returning.\n");
+        return -1;
+    }
+
+    if(currentVal == k)
+    {
+        printf("Value found!\n");
+        return currentVal;
+    }
+    else
+    {
+        printf("Value not found\n");
+        return -1;
+    }
 }
 
-void listInsert(struct linkedList **L, int x)
+void listInsert(struct Node **L, int x)
 {
-    struct linkedList *New = (struct linkedList*)malloc(sizeof(struct linkedList)); //Allocate in memory the new element to insert
+    struct Node *New = (struct Node*)malloc(sizeof(struct Node)); //Allocate in memory the new element to insert
 
     //Initialize new element values
     New->val = x;
@@ -50,22 +74,64 @@ void listInsert(struct linkedList **L, int x)
     */
 }
 
-void listDelete(struct linkedList **L, int x)
+void listDelete(struct Node **L, int x)
 {
-    /*
-    if prev[x] != NIL
-       then next[prev[x]] <- next[x]
-       else head[L] <- next[x]
-    if next[x] != NIL
-       then prev[next[x]] <- prev[x]
-    */
+    if(!*L)
+    {
+        printf("LIST IS EMPTY, UNABLE TO DELETE\n");
+        return;
+    }
 
+    struct Node* currentPTR = *L;
+    struct Node* Temp;
+
+    //Check first if the node to delete is the node at the start
+    if(currentPTR->val == x)
+    {
+        Temp = currentPTR->next;
+
+        *currentPTR = *Temp;
+        return;
+    }
+
+    while(currentPTR->next)
+    {
+        if (currentPTR->next->val == x)
+        {
+            Temp = currentPTR->next;
+            currentPTR->next = Temp->next;
+            break;
+        }
+        currentPTR = currentPTR->next;
+    }
+}
+
+void debugList(struct Node **L)
+{
+    struct Node* debugNode = *L;
+
+    if(debugNode)
+    {
+        while (1 == 1)
+        {
+            printf("DEBUGGING LINKED LIST: %d\n", debugNode->val);
+            if(debugNode->next)
+                debugNode = debugNode->next;
+            else
+                break;
+        }
+    }
+    else
+    {
+        printf("UNABLE TO DEBUG LIST: LIST IS EMPTY\n");
+        return;
+    }
+    
 }
 
 int main(int argc, char** argv)
 {
-    struct linkedList *L;
-    L->next = NULL;
+    struct Node *L;
 
     listInsert(&L, 5);
     listInsert(&L, 8);
@@ -73,21 +139,25 @@ int main(int argc, char** argv)
     listInsert(&L, 15);
     listInsert(&L, 9);
 
-    if(L)
-    {
-        while(1==1)
-        {
-            printf("DEBUGGING LINKED LIST: %d\n", L->val);
-            if(L->next)
-                L = L->next;
-            else
-                break;
-        }
-    }
-    else
-    {
-        printf("LIST IS NULL, PLEASE ADD VALUES BEFORE CONTINUING\n");
-    }
+    int searchQuery = 9;
+    int queryResult = listSearch(&L, searchQuery);
+
+    debugList(&L);
+    printf("#####################\n");
+    listDelete(&L, 15);
+
+    debugList(&L);
+    printf("#####################\n");
+
+    listDelete(&L, 9);
+
+    debugList(&L);
+    printf("#####################\n");
+
+    listDelete(&L, 8);
+
+    debugList(&L);
+    printf("#####################\n");
     
     return 0;
 }
