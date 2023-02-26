@@ -91,6 +91,7 @@ void listDelete(struct Node **L, int x)
         Temp = currentPTR->next;
 
         *currentPTR = *Temp;
+        free(Temp);
         return;
     }
 
@@ -100,23 +101,22 @@ void listDelete(struct Node **L, int x)
         {
             Temp = currentPTR->next;
             currentPTR->next = Temp->next;
+            free(Temp);
             break;
         }
         currentPTR = currentPTR->next;
     }
 }
 
-void debugList(struct Node **L)
+void debugList(struct Node *L)
 {
-    struct Node* debugNode = *L;
-
-    if(debugNode)
+    if(L)
     {
         while (1 == 1)
         {
-            printf("DEBUGGING LINKED LIST: %d\n", debugNode->val);
-            if(debugNode->next)
-                debugNode = debugNode->next;
+            printf("DEBUGGING LINKED LIST: %d\n", L->val);
+            if(L->next)
+                L = L->next;
             else
                 break;
         }
@@ -129,9 +129,33 @@ void debugList(struct Node **L)
     
 }
 
+void cleanUp(struct Node *L){
+    struct Node* Temp = NULL;
+    if(L)
+    {
+        while(1 == 1)
+        {
+            if(L->next)
+            {
+                Temp = L;
+                L = L->next;
+                free(Temp);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        free(L);
+    }
+}
+
+
+
 int main(int argc, char** argv)
 {
-    struct Node *L;
+    struct Node *L = NULL;
 
     listInsert(&L, 5);
     listInsert(&L, 8);
@@ -142,22 +166,24 @@ int main(int argc, char** argv)
     int searchQuery = 9;
     int queryResult = listSearch(&L, searchQuery);
 
-    debugList(&L);
+    debugList(L);
     printf("#####################\n");
     listDelete(&L, 15);
 
-    debugList(&L);
+    debugList(L);
     printf("#####################\n");
 
     listDelete(&L, 9);
 
-    debugList(&L);
+    debugList(L);
     printf("#####################\n");
 
     listDelete(&L, 8);
 
-    debugList(&L);
+    debugList(L);
     printf("#####################\n");
+
+    cleanUp(L);
     
     return 0;
 }
